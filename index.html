@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>The sphere is a lie</title>
+</head>
+<style>
+  #mapHolder {
+    position: relative;
+    width: 1200px;
+  }
+  .blip {
+    width: 15px;
+    height: 15px;
+    background: red;
+    position: absolute;
+    border-radius: 50%;
+  }
+  </style>
+<body>
+  <div id="mapHolder">
+    <img id='earthProjection' src="" alt="" style="width: 100%;">
+  </div>
+  <script>
+    var falseGovernmentProjectionSrc = 'https://upload.wikimedia.org/wikipedia/commons/8/83/Equirectangular_projection_SW.jpg';
+    // var falseGovernmentProjectionSrc = 'https://upload.wikimedia.org/wikipedia/commons/e/ec/Web_maps_Mercator_projection_SW.jpg';
+    var img = document.getElementById('earthProjection');
+    img.setAttribute('src', falseGovernmentProjectionSrc);
+
+    var issSpeed = 7.66; // km/s
+    var TIME_FOR_100 = 10/issSpeed;
+    // alert(TIME_FOR_100);
+
+    var width = img.width;
+
+    function createBlip(info) {
+      var blip = document.createElement('div');
+      var holder = document.getElementById('mapHolder');
+      blip.className = 'blip';
+      holder.appendChild(blip);
+      var { top, left } = toMapCoordinates(info.iss_position);
+      // var { top, left } = toMapCoordinates({ longitude: '-24', latitude: '45' });
+      var style = `top: 0; left: ${left}px; top: ${top}px;`
+      blip.setAttribute('style', style);
+    }
+
+    // window.setInterval(function() {
+    //   var blip = document.createElement('div');
+    //   var holder = document.getElementById('mapHolder');
+    //   blip.className = 'blip';
+    //   holder.appendChild(blip);
+    //   var style = `
+    //     top: 0;
+    //     left: ${holder.offsetWidth/2 - 7.5}px;
+    //     top: ${holder.offsetHeight/2 - 7.5}px;`
+    //   blip.setAttribute('style', style);
+    // }, 1000);
+
+    window.setInterval(function() {
+      var issApi = 'http://api.open-notify.org/iss-now.json';
+      // createBlip({});
+
+      fetch(issApi)
+        .then(function (response) { return response.json(); })
+        .then(function(info) {
+          createBlip(info);
+        })
+    }, 1000);
+
+
+    function toMapCoordinates(info) {
+      console.log(info);
+      var holder = document.getElementById('mapHolder');
+      var top = holder.offsetHeight * (90 - parseFloat(info.latitude))/180;
+      var left = holder.offsetWidth * (180 + parseFloat(info.longitude))/360;N
+      console.log(top);
+      console.log(left);
+      return { top, left };
+    }
+
+  </script>
+
+</body>
+</html>
